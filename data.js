@@ -202,10 +202,16 @@ const MODELS = [
 
 // Quick example presets: per-call token usage + monthly call volume
 const PRESETS = {
-  chatbot:   { label: "Chatbot",        inputTokens: 1_000,  outputTokens: 300,   callsPerMonth: 20_000 },
-  code:      { label: "Code Assistant", inputTokens: 5_000,  outputTokens: 1_500, callsPerMonth: 5_000 },
-  docs:      { label: "Doc Analysis",   inputTokens: 30_000, outputTokens: 2_000, callsPerMonth: 1_000 },
-  content:   { label: "Content Gen",    inputTokens: 1_500,  outputTokens: 3_000, callsPerMonth: 3_000 },
+  chatbot:    { label: "Chatbot",             inputTokens: 1_000,  outputTokens: 300,   callsPerMonth: 20_000 },
+  code:       { label: "Code Assistant",      inputTokens: 5_000,  outputTokens: 1_500, callsPerMonth: 5_000 },
+  docs:       { label: "Doc Analysis",        inputTokens: 30_000, outputTokens: 2_000, callsPerMonth: 1_000 },
+  content:    { label: "Content Gen",         inputTokens: 1_500,  outputTokens: 3_000, callsPerMonth: 3_000 },
+  ppt:        { label: "10-Page PPT",         inputTokens: 2_000,  outputTokens: 3_500, callsPerMonth: 30 },
+  financial:  { label: "Financial Statement", inputTokens: 40_000, outputTokens: 1_500, callsPerMonth: 100 },
+  buildapp:   { label: "Build an App",        inputTokens: 8_000,  outputTokens: 4_000, callsPerMonth: 500 },
+  email:      { label: "Email Campaign",      inputTokens: 600,    outputTokens: 350,   callsPerMonth: 2_000 },
+  contract:   { label: "Contract Review",     inputTokens: 25_000, outputTokens: 2_000, callsPerMonth: 60 },
+  translate:  { label: "Translate a Doc",     inputTokens: 6_000,  outputTokens: 6_000, callsPerMonth: 200 },
 };
 
 // Approximate conversion factors (industry heuristics)
