@@ -63,8 +63,6 @@
 
   const fmtContext = (n) => (n >= 1e6 ? (n / 1e6).toLocaleString("en-US", { maximumFractionDigits: 2 }) + "M" : Math.round(n / 1000) + "K");
 
-  const fmtInt = (n) => Math.round(n).toLocaleString("en-US");
-
   // ---------- results grid ----------
   const resultsEl = document.getElementById("results");
 
@@ -231,9 +229,10 @@
   const UNIT_WORDS = { tokens: "Tokens", words: "Words", chars: "Characters" };
 
   function refreshFieldValues() {
-    inputEl.value = fmtInt(tokensToDisplay(state.inputTokens));
-    outputEl.value = fmtInt(tokensToDisplay(state.outputTokens));
-    callsEl.value = state.callsPerMonth;
+    // number inputs reject locale-formatted strings ("2,000") — use plain digits
+    inputEl.value = String(Math.round(tokensToDisplay(state.inputTokens)));
+    outputEl.value = String(Math.round(tokensToDisplay(state.outputTokens)));
+    callsEl.value = String(state.callsPerMonth);
     inputLabel.innerHTML = `Input ${UNIT_WORDS[state.unit]} <em>(per call)</em>`;
     outputLabel.innerHTML = `Output ${UNIT_WORDS[state.unit]} <em>(per call)</em>`;
   }
