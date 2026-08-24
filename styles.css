@@ -161,6 +161,30 @@ code {
 .preset.active { background: var(--primary); color: var(--primary-foreground); border-color: transparent; font-weight: 600; }
 .preset-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
 
+/* Prompt caching */
+.caching-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.cache-toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer; }
+.cache-toggle input { accent-color: var(--accent); width: 15px; height: 15px; }
+.caching-row input[type="range"] { accent-color: var(--accent); width: 160px; }
+.caching-row input[type="range"]:disabled { opacity: 0.4; }
+.cache-value { color: var(--muted); font-size: 0.85rem; min-width: 80px; }
+.cache-note { color: var(--muted); font-size: 0.82rem; }
+.cache-line {
+  margin-top: 12px;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+.cache-line strong { color: var(--success); }
+.save {
+  color: var(--success);
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1px solid var(--success);
+  border-radius: 999px;
+  padding: 1px 7px;
+  margin-left: 4px;
+}
+
 /* Sample download */
 .sample-download { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .sample-btn {

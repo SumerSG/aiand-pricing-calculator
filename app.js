@@ -2,7 +2,24 @@
 (function () {
   "use strict";
 
+  // Merge the live catalog (models-live.js, from scripts/sync-models.mjs)
+  // with the hand-written editorial layer (data.js). Unknown ids get a
+  // fallback so new models never break the page.
+  const MODELS = MODELS_LIVE.map((m) => {
+    const e = EDITORIAL[m.id] ?? {};
+    return {
+      ...m,
+      provider: PROVIDER_NAMES[m.provider] ?? m.provider,
+      quality: e.quality ?? null,
+      popularity: e.popularity ?? null,
+      description: e.description ?? "New model — details coming soon.",
+      specialties: e.specialties ?? m.capabilities.map((c) => `Supports ${c.replace(/_/g, " ")}`),
+      limitations: e.limitations ?? [],
+    };
+  });
+
   const MAX_SLOTS = 2;
+  const CACHE_MIN_TOKENS = 1024; // docs: caching applies to prompts of 1,024+ tokens
 
   const state = {
     unit: "tokens",      // tokens | words | chars
@@ -12,6 +29,8 @@
     callsPerMonth: 10_000,
     slots: ["deepseek-ai/deepseek-v4-flash"],
     activePreset: null,
+    cacheOn: false,
+    cacheHit: 0.6,
   };
 
   // ---------- unit conversion ----------
@@ -38,6 +57,30 @@
 
   function monthlyCost(model) {
     return costPerCall(model) * state.callsPerMonth;
+  }
+
+  // ---------- prompt caching ----------
+  // cost = calls × [(1−hit)·input·rate + hit·input·cached_rate + output·rate]
+  function cacheApplies(m) {
+    return state.cacheOn && state.inputTokens >= CACHE_MIN_TOKENS && m.cachedInputPer1M != null;
+  }
+
+  function cachedMonthlyCost(model) {
+    const inRate = (1 - state.cacheHit) * model.inputPer1M + state.cacheHit * model.cachedInputPer1M;
+    return (
+      ((state.inputTokens / 1e6) * inRate + (state.outputTokens / 1e6) * model.outputPer1M) *
+      state.callsPerMonth
+    );
+  }
+
+  function cacheSavings(m) {
+    const std = monthlyCost(m);
+    return std > 0 ? Math.round((1 - cachedMonthlyCost(m) / std) * 100) : 0;
+  }
+
+  function cacheLineHTML(m) {
+    if (!cacheApplies(m)) return "";
+    return `<div class="cache-line">With caching (${Math.round(state.cacheHit * 100)}% hit): <strong>${fmtMoney(cachedMonthlyCost(m))}</strong> <span class="save">−${cacheSavings(m)}%</span></div>`;
   }
 
   // ---------- sorting ----------
@@ -99,6 +142,7 @@
             <span class="stat-value cost">${fmtMoney(monthlyCost(m))}</span>
           </div>
         </div>
+        ${cacheLineHTML(m)}
         <div class="caps">${m.capabilities.map((c) => `<span class="cap">${c}</span>`).join("")}</div>
       `;
       card.addEventListener("click", () => {
@@ -134,7 +178,7 @@
         <span><strong>Context:</strong> ${fmtContext(m.context)}</span>
         <span><strong>Quality:</strong> ${m.quality ?? "—"}${m.quality ? " (Theozard)" : ""}</span>
         <span><strong>Popularity:</strong> ${m.popularity != null ? "#" + m.popularity + " (OpenRouter)" : "—"}</span>
-        <span><strong>Price:</strong> ${m.inputPer1M === 0 && m.outputPer1M === 0 ? "Free" : `${fmtPrice(m.inputPer1M)} in / ${fmtPrice(m.outputPer1M)} out per 1M`}</span>
+        <span><strong>Price:</strong> ${m.inputPer1M === 0 && m.outputPer1M === 0 ? "Free" : `${fmtPrice(m.inputPer1M)} in / ${fmtPrice(m.outputPer1M)} out per 1M`}${m.cachedInputPer1M != null ? ` · cached input ${fmtPrice(m.cachedInputPer1M)}` : ""}</span>
       </div>
       <div class="detail-cols">
         <div>
@@ -154,15 +198,21 @@
     const price = (m) =>
       m.inputPer1M === 0 && m.outputPer1M === 0
         ? "Free"
-        : `${fmtPrice(m.inputPer1M)} in / ${fmtPrice(m.outputPer1M)} out per 1M`;
+        : `${fmtPrice(m.inputPer1M)} in / ${fmtPrice(m.outputPer1M)} out per 1M` +
+          (m.cachedInputPer1M != null ? ` · ${fmtPrice(m.cachedInputPer1M)} cached` : "");
     const quality = (m) => (m.quality != null ? `${m.quality} (Theozard)` : "—");
     const popularity = (m) => (m.popularity != null ? `#${m.popularity} (OpenRouter)` : "—");
+    const cacheCell = (m) =>
+      cacheApplies(m)
+        ? `<span class="cmp-cost">${fmtMoney(cachedMonthlyCost(m))}</span> <span class="save">−${cacheSavings(m)}%</span>`
+        : "—";
     const list = (items, cls) => `<ul class="${cls}">${items.map((s) => `<li>${s}</li>`).join("")}</ul>`;
 
     const rows = [
       ["", `<span class="model-id">${a.id}</span> <span class="provider">${a.provider}</span>`,
            `<span class="model-id">${b.id}</span> <span class="provider">${b.provider}</span>`],
       ["Monthly cost", `<span class="cmp-cost">${fmtMoney(monthlyCost(a))}</span>`, `<span class="cmp-cost">${fmtMoney(monthlyCost(b))}</span>`],
+      ["With caching", cacheCell(a), cacheCell(b)],
       ["Description", a.description, b.description],
       ["Context", fmtContext(a.context), fmtContext(b.context)],
       ["Quality", quality(a), quality(b)],
@@ -250,6 +300,7 @@
   function update() {
     render();
     renderSlots();
+    refreshCacheUI();
   }
 
   // ---------- inputs ----------
@@ -309,6 +360,32 @@
 
   wireToggle("unitToggle", "unit", refreshFieldValues);
   wireToggle("sortToggle", "sort", render);
+
+  // ---------- prompt caching controls ----------
+  const cacheToggleEl = document.getElementById("cacheToggle");
+  const cacheRateEl = document.getElementById("cacheRate");
+  const cacheValueEl = document.getElementById("cacheValue");
+  const cacheNoteEl = document.getElementById("cacheNote");
+
+  function refreshCacheUI() {
+    cacheRateEl.disabled = !state.cacheOn;
+    cacheValueEl.textContent = `${Math.round(state.cacheHit * 100)}% hit rate`;
+    cacheNoteEl.textContent =
+      state.cacheOn && state.inputTokens < CACHE_MIN_TOKENS
+        ? `Caching applies to prompts of ${CACHE_MIN_TOKENS.toLocaleString()}+ tokens — increase input tokens to see savings.`
+        : "";
+  }
+
+  cacheToggleEl.addEventListener("change", () => {
+    state.cacheOn = cacheToggleEl.checked;
+    refreshCacheUI();
+    update();
+  });
+  cacheRateEl.addEventListener("input", () => {
+    state.cacheHit = Number(cacheRateEl.value) / 100;
+    refreshCacheUI();
+    update();
+  });
 
   // ---------- presets + sample download ----------
   const presetWrap = document.getElementById("presetButtons");
@@ -378,5 +455,6 @@
   // ---------- init ----------
   refreshFieldValues();
   renderSampleButton();
+  refreshCacheUI();
   update();
 })();
