@@ -124,12 +124,19 @@ code {
 .preset-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
 
 /* Model picker */
-.model-picker {
-  display: grid;
-  gap: 14px;
-  margin-bottom: 28px;
+.model-picker { margin-bottom: 28px; }
+.picker-slots { display: grid; gap: 14px; grid-template-columns: 1fr; }
+@media (min-width: 720px) {
+  .picker-slots.two { grid-template-columns: 1fr 1fr; }
+}
+.slot-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
 }
 .model-picker select {
+  flex: 1;
+  min-width: 0;
   background: var(--panel-2);
   border: 1px solid var(--input);
   border-radius: var(--radius);
@@ -137,10 +144,24 @@ code {
   font: inherit;
   font-size: 0.95rem;
   padding: 10px 12px;
-  width: 100%;
   cursor: pointer;
 }
 .model-picker select:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+.slot-btn {
+  appearance: none;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0 14px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.slot-btn:hover { border-color: var(--accent); color: var(--accent); }
+.remove-model { font-size: 1.1rem; line-height: 1; padding: 0 12px; }
+.remove-model:hover { border-color: var(--destructive); color: var(--destructive); }
 
 .model-detail {
   background: var(--panel);

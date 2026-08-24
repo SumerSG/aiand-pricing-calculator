@@ -2,13 +2,15 @@
 (function () {
   "use strict";
 
+  const MAX_SLOTS = 2;
+
   const state = {
     unit: "tokens",      // tokens | words | chars
     sort: "quality",     // quality | popularity | price | cost
     inputTokens: 2_000,
     outputTokens: 500,
     callsPerMonth: 10_000,
-    selectedId: "deepseek-ai/deepseek-v4-flash",
+    slots: ["deepseek-ai/deepseek-v4-flash"],
   };
 
   // ---------- unit conversion ----------
@@ -70,7 +72,7 @@
     resultsEl.innerHTML = "";
     for (const m of sortedModels()) {
       const card = document.createElement("article");
-      card.className = "card" + (m.id === state.selectedId ? " selected" : "");
+      card.className = "card" + (state.slots.includes(m.id) ? " selected" : "");
       card.innerHTML = `
         <div class="card-head">
           <span class="model-id">${m.id}</span>
@@ -100,39 +102,24 @@
         </div>
         <div class="caps">${m.capabilities.map((c) => `<span class="cap">${c}</span>`).join("")}</div>
       `;
-      card.addEventListener("click", () => selectModel(m.id));
+      card.addEventListener("click", () => {
+        state.slots[0] = m.id;
+        update();
+      });
       resultsEl.appendChild(card);
     }
   }
 
-  // ---------- model picker + detail panel ----------
-  const selectEl = document.getElementById("modelSelect");
-  const detailEl = document.getElementById("modelDetail");
+  // ---------- model picker slots + detail panels ----------
+  const pickerSlotsEl = document.getElementById("pickerSlots");
 
-  function buildSelect() {
-    for (const m of MODELS) {
-      const opt = document.createElement("option");
-      opt.value = m.id;
-      const price =
-        m.inputPer1M === 0 && m.outputPer1M === 0
-          ? "Free"
-          : `${fmtPrice(m.inputPer1M)} in / ${fmtPrice(m.outputPer1M)} out per 1M`;
-      opt.textContent = `${m.id} — ${price}`;
-      selectEl.appendChild(opt);
-    }
-    selectEl.value = state.selectedId;
+  // Dropdown options show only the model name; prices live in the detail panel.
+  function optionLabel(m) {
+    return m.id;
   }
 
-  function selectModel(id) {
-    state.selectedId = id;
-    selectEl.value = id;
-    update();
-  }
-
-  function renderDetail() {
-    const m = MODELS.find((x) => x.id === state.selectedId);
-    if (!m) return;
-    detailEl.innerHTML = `
+  function detailHTML(m) {
+    return `
       <div class="detail-head">
         <div>
           <span class="model-id">${m.id}</span>
@@ -163,11 +150,75 @@
     `;
   }
 
-  selectEl.addEventListener("change", () => selectModel(selectEl.value));
+  function renderSlots() {
+    pickerSlotsEl.innerHTML = "";
+    pickerSlotsEl.classList.toggle("two", state.slots.length > 1);
+
+    state.slots.forEach((id, i) => {
+      const m = MODELS.find((x) => x.id === id);
+      if (!m) return;
+
+      const slot = document.createElement("div");
+      slot.className = "slot";
+
+      // controls row: dropdown + add/remove
+      const controls = document.createElement("div");
+      controls.className = "slot-controls";
+
+      const select = document.createElement("select");
+      select.setAttribute("aria-label", "Model");
+      for (const mod of MODELS) {
+        const opt = document.createElement("option");
+        opt.value = mod.id;
+        opt.textContent = optionLabel(mod);
+        select.appendChild(opt);
+      }
+      select.value = id;
+      select.addEventListener("change", () => {
+        state.slots[i] = select.value;
+        update();
+      });
+      controls.appendChild(select);
+
+      if (i === 0 && state.slots.length < MAX_SLOTS) {
+        const add = document.createElement("button");
+        add.className = "slot-btn add-model";
+        add.textContent = "+ Add model";
+        add.addEventListener("click", () => {
+          // default the new slot to a model that isn't already shown
+          const next = MODELS.find((x) => !state.slots.includes(x.id));
+          if (next) state.slots.push(next.id);
+          update();
+        });
+        controls.appendChild(add);
+      }
+
+      if (i > 0) {
+        const rm = document.createElement("button");
+        rm.className = "slot-btn remove-model";
+        rm.textContent = "×";
+        rm.setAttribute("aria-label", "Remove model");
+        rm.addEventListener("click", () => {
+          state.slots.splice(i, 1);
+          update();
+        });
+        controls.appendChild(rm);
+      }
+
+      slot.appendChild(controls);
+
+      const detail = document.createElement("article");
+      detail.className = "model-detail";
+      detail.innerHTML = detailHTML(m);
+      slot.appendChild(detail);
+
+      pickerSlotsEl.appendChild(slot);
+    });
+  }
 
   function update() {
     render();
-    renderDetail();
+    renderSlots();
   }
 
   // ---------- inputs ----------
@@ -235,7 +286,6 @@
   }
 
   // ---------- init ----------
-  buildSelect();
   refreshFieldValues();
   update();
 })();
