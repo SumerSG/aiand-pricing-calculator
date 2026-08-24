@@ -149,18 +149,43 @@
     `;
   }
 
+  // Side-by-side comparison rows: every part of both models aligned
+  function compareHTML(a, b) {
+    const price = (m) =>
+      m.inputPer1M === 0 && m.outputPer1M === 0
+        ? "Free"
+        : `${fmtPrice(m.inputPer1M)} in / ${fmtPrice(m.outputPer1M)} out per 1M`;
+    const quality = (m) => (m.quality != null ? `${m.quality} (Theozard)` : "—");
+    const popularity = (m) => (m.popularity != null ? `#${m.popularity} (OpenRouter)` : "—");
+    const list = (items, cls) => `<ul class="${cls}">${items.map((s) => `<li>${s}</li>`).join("")}</ul>`;
+
+    const rows = [
+      ["", `<span class="model-id">${a.id}</span> <span class="provider">${a.provider}</span>`,
+           `<span class="model-id">${b.id}</span> <span class="provider">${b.provider}</span>`],
+      ["Monthly cost", `<span class="cmp-cost">${fmtMoney(monthlyCost(a))}</span>`, `<span class="cmp-cost">${fmtMoney(monthlyCost(b))}</span>`],
+      ["Description", a.description, b.description],
+      ["Context", fmtContext(a.context), fmtContext(b.context)],
+      ["Quality", quality(a), quality(b)],
+      ["Popularity", popularity(a), popularity(b)],
+      ["Price per 1M", price(a), price(b)],
+      ["Specialties", list(a.specialties, "good"), list(b.specialties, "good")],
+      ["Limitations", list(a.limitations, "bad"), list(b.limitations, "bad")],
+    ];
+
+    return `<article class="model-detail compare">${rows
+      .map(([label, ca, cb]) => `<div class="cmp-row"><span class="cmp-label">${label}</span><div class="cmp-cell">${ca}</div><div class="cmp-cell">${cb}</div></div>`)
+      .join("")}</article>`;
+  }
+
   function renderSlots() {
     pickerSlotsEl.innerHTML = "";
     pickerSlotsEl.classList.toggle("two", state.slots.length > 1);
 
+    // dropdowns row (+ add/remove buttons)
+    const controlsRow = document.createElement("div");
+    controlsRow.className = "slots-controls";
+
     state.slots.forEach((id, i) => {
-      const m = MODELS.find((x) => x.id === id);
-      if (!m) return;
-
-      const slot = document.createElement("div");
-      slot.className = "slot";
-
-      // controls row: dropdown + add/remove
       const controls = document.createElement("div");
       controls.className = "slot-controls";
 
@@ -204,15 +229,22 @@
         controls.appendChild(rm);
       }
 
-      slot.appendChild(controls);
+      controlsRow.appendChild(controls);
+    });
+    pickerSlotsEl.appendChild(controlsRow);
 
+    // detail area: single panel, or an aligned side-by-side comparison
+    const models = state.slots.map((id) => MODELS.find((x) => x.id === id)).filter(Boolean);
+    if (models.length === 2) {
+      const wrap = document.createElement("div");
+      wrap.innerHTML = compareHTML(models[0], models[1]);
+      pickerSlotsEl.appendChild(wrap.firstElementChild);
+    } else if (models.length === 1) {
       const detail = document.createElement("article");
       detail.className = "model-detail";
-      detail.innerHTML = detailHTML(m);
-      slot.appendChild(detail);
-
-      pickerSlotsEl.appendChild(slot);
-    });
+      detail.innerHTML = detailHTML(models[0]);
+      pickerSlotsEl.appendChild(detail);
+    }
   }
 
   function update() {
