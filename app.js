@@ -2,21 +2,25 @@
 (function () {
   "use strict";
 
-  // Merge the live catalog (models-live.js, from scripts/sync-models.mjs)
-  // with the hand-written editorial layer (data.js). Unknown ids get a
-  // fallback so new models never break the page.
-  const MODELS = MODELS_LIVE.map((m) => {
-    const e = EDITORIAL[m.id] ?? {};
-    return {
-      ...m,
-      provider: PROVIDER_NAMES[m.provider] ?? m.provider,
-      quality: e.quality ?? null,
-      popularity: e.popularity ?? null,
-      description: e.description ?? "New model — details coming soon.",
-      specialties: e.specialties ?? m.capabilities.map((c) => `Supports ${c.replace(/_/g, " ")}`),
-      limitations: e.limitations ?? [],
-    };
-  });
+  // Merge live catalog facts with the hand-written editorial layer (data.js).
+  // Unknown ids get a fallback so new models never break the page.
+  function mergeEditorial(list) {
+    return list.map((m) => {
+      const e = EDITORIAL[m.id] ?? {};
+      return {
+        ...m,
+        provider: PROVIDER_NAMES[m.provider] ?? m.provider,
+        quality: e.quality ?? null,
+        popularity: e.popularity ?? null,
+        description: e.description ?? "New model — details coming soon.",
+        specialties: e.specialties ?? m.capabilities.map((c) => `Supports ${c.replace(/_/g, " ")}`),
+        limitations: e.limitations ?? [],
+      };
+    });
+  }
+
+  // Instant paint from the bundled snapshot; refreshed live from models.dev below.
+  let MODELS = mergeEditorial(MODELS_LIVE);
 
   const MAX_SLOTS = 2;
   const CACHE_MIN_TOKENS = 1024; // docs: caching applies to prompts of 1,024+ tokens
@@ -462,9 +466,56 @@
     try { localStorage.setItem("theme", next); } catch (e) {}
   });
 
+  // ---------- live pricing (models.dev — public, no key) ----------
+  // Fetches the latest ai& catalog on page load; cached input rates fall
+  // back to the bundled snapshot where models.dev has none.
+  function fromModelsDev(m) {
+    const mods = m.modalities?.input ?? [];
+    const caps = [];
+    if (m.reasoning) caps.push("reasoning");
+    if (m.tool_call) caps.push("tool_calling");
+    if (mods.includes("image")) caps.push("vision");
+    if (mods.includes("video")) caps.push("video");
+    if (mods.includes("pdf")) caps.push("document");
+    return {
+      id: m.id,
+      provider: m.id.split("/")[0],
+      context: m.limit?.context ?? 0,
+      capabilities: caps,
+      inputPer1M: m.cost?.input ?? 0,
+      outputPer1M: m.cost?.output ?? 0,
+      cachedInputPer1M: m.cost?.cache_read ?? null,
+    };
+  }
+
+  async function refreshLive() {
+    try {
+      const res = await fetch("https://models.dev/api.json");
+      if (!res.ok) return;
+      const provider = (await res.json())?.aiand;
+      if (!provider?.models) return;
+
+      const snap = Object.fromEntries(MODELS_LIVE.map((m) => [m.id, m]));
+      const live = Object.values(provider.models)
+        .map(fromModelsDev)
+        .map((m) => ({ ...m, cachedInputPer1M: m.cachedInputPer1M ?? snap[m.id]?.cachedInputPer1M ?? null }))
+        .sort((a, b) => a.inputPer1M + a.outputPer1M - (b.inputPer1M + b.outputPer1M));
+      if (!live.length) return;
+
+      MODELS = mergeEditorial(live);
+      // drop selections for models that disappeared; never leave zero slots
+      state.slots = state.slots.filter((id) => MODELS.some((m) => m.id === id));
+      if (!state.slots.length && MODELS.length) state.slots = [MODELS[0].id];
+      update();
+    } catch {
+      /* offline or blocked — the bundled snapshot stays in place */
+    }
+  }
+
   // ---------- init ----------
   refreshFieldValues();
   renderSampleButton();
   refreshCacheUI();
   update();
+  refreshLive();
 })();

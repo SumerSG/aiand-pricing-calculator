@@ -126,9 +126,9 @@
       <h2>How cost is calculated</h2>
       <pre class="formula">monthly_cost = calls_per_month × (input_tokens / 1M × input_price + output_tokens / 1M × output_price)</pre>
       <p>
-        Prices are USD per 1M tokens — a live snapshot of <code>GET https://api.aiand.com/v1/models</code>
-        (Aug 24, 2026), including per-model cached input rates. Refresh anytime with
-        <code>node scripts/sync-models.mjs</code>. ai&amp; bills against a prepaid credit balance,
+        Prices are USD per 1M tokens, refreshed <strong>live on every page load</strong> from
+        <a href="https://models.dev" target="_blank" rel="noopener">models.dev</a> (cached input rates
+        from the ai&amp; API snapshot, Aug 24, 2026). ai&amp; bills against a prepaid credit balance,
         deducting atomically when each request completes.
       </p>
       <p>
