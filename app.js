@@ -60,15 +60,25 @@
   }
 
   // ---------- prompt caching ----------
-  // cost = calls × [(1−hit)·input·rate + hit·input·cached_rate + output·rate]
+  // Docs: prompts of 1,024+ tokens qualify; the cached prefix is counted in
+  // 128-token increments and bills at the model's cached_input_per_1m rate.
+  const CACHE_INCREMENT = 128;
+
   function cacheApplies(m) {
     return state.cacheOn && state.inputTokens >= CACHE_MIN_TOKENS && m.cachedInputPer1M != null;
   }
 
+  function cachedTokens() {
+    return Math.floor((state.inputTokens * state.cacheHit) / CACHE_INCREMENT) * CACHE_INCREMENT;
+  }
+
   function cachedMonthlyCost(model) {
-    const inRate = (1 - state.cacheHit) * model.inputPer1M + state.cacheHit * model.cachedInputPer1M;
+    const cached = cachedTokens();
+    const uncached = state.inputTokens - cached;
     return (
-      ((state.inputTokens / 1e6) * inRate + (state.outputTokens / 1e6) * model.outputPer1M) *
+      ((cached / 1e6) * model.cachedInputPer1M +
+        (uncached / 1e6) * model.inputPer1M +
+        (state.outputTokens / 1e6) * model.outputPer1M) *
       state.callsPerMonth
     );
   }
@@ -143,9 +153,7 @@
           </div>
         </div>
         ${cacheLineHTML(m)}
-        <div class="caps">${m.cachedInputPer1M != null
-          ? '<span class="cap cacheable">caching</span>'
-          : '<span class="cap no-cache">no caching</span>'}${m.capabilities.map((c) => `<span class="cap">${c}</span>`).join("")}</div>
+        <div class="caps">${m.capabilities.map((c) => `<span class="cap">${c}</span>`).join("")}</div>
       `;
       card.addEventListener("click", () => {
         state.slots[0] = m.id;

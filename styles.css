@@ -172,8 +172,6 @@ code {
 .info-icon { color: var(--muted); display: inline-flex; cursor: help; }
 .info-icon svg { width: 15px; height: 15px; display: block; }
 .info-icon:hover { color: var(--accent); }
-.cap.cacheable { color: var(--success); border-color: var(--success); }
-.cap.no-cache { opacity: 0.55; }
 .cache-line {
   margin-top: 12px;
   font-size: 0.88rem;

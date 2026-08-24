@@ -93,7 +93,7 @@
           <span>Prompt caching</span>
         </label>
         <span class="info-icon" role="img" aria-label="About prompt caching"
-              title="ai& automatically detects repeated prompt prefixes and bills the reused portion at the model's cached input rate. Applies to prompts of 1,024+ tokens (counted in 128-token increments), reused within ~10 minutes, scoped to your organization. No code changes needed.">
+              title="ai& automatically detects repeated prompt prefixes and bills the reused portion at the model's cached input rate. Applies to prompts of 1,024 tokens or more, with the cached prefix counted in 128-token increments. Reuse lasts ~10 minutes and is scoped to your organization. No code changes needed.">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5"/><path d="M12 8h.01"/></svg>
         </span>
         <input type="range" id="cacheRate" min="0" max="90" step="5" value="60" disabled />
@@ -133,7 +133,8 @@
       </p>
       <p>
         Enable <strong>Prompt caching</strong> above to estimate savings: repeated prompt prefixes
-        (≥1,024 tokens, ~10-minute reuse window) bill at each model's cached input rate.
+        (≥1,024 tokens, counted in 128-token increments, ~10-minute reuse window) bill at each
+        model's cached input rate. All models in the catalog currently offer a cached rate.
       </p>
       <p>
         Quality and popularity are the Theozard quality score and OpenRouter popularity rank from the
