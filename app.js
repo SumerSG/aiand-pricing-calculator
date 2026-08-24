@@ -30,7 +30,7 @@
     slots: ["deepseek-ai/deepseek-v4-flash"],
     activePreset: null,
     cacheOn: false,
-    cachePrefix: 1_536, // tokens of stable leading prefix reused across calls
+    cacheShare: 0.6, // share of input tokens that repeat across calls
   };
 
   // ---------- unit conversion ----------
@@ -74,8 +74,8 @@
   }
 
   function cachedTokens() {
-    const maxCacheable = Math.floor(state.inputTokens / CACHE_INCREMENT) * CACHE_INCREMENT;
-    return Math.min(state.cachePrefix, maxCacheable);
+    // docs: cached portion is counted in 128-token increments
+    return Math.floor((state.inputTokens * state.cacheShare) / CACHE_INCREMENT) * CACHE_INCREMENT;
   }
 
   function cachedMonthlyCost(model) {
@@ -380,10 +380,9 @@
     const tooSmall = state.inputTokens < CACHE_MIN_TOKENS;
     cacheToggleEl.disabled = tooSmall;
     cacheRateEl.disabled = !state.cacheOn || tooSmall;
-    const pct = state.inputTokens > 0 ? Math.round((cachedTokens() / state.inputTokens) * 100) : 0;
-    cacheValueEl.textContent = `${state.cachePrefix.toLocaleString()} tokens (${pct}%)`;
+    cacheValueEl.textContent = `${Math.round(state.cacheShare * 100)}% of input repeats`;
     cacheNoteEl.textContent = tooSmall
-      ? `Caching applies to prompts of ${CACHE_MIN_TOKENS.toLocaleString()}+ tokens — increase input tokens to enable it.`
+      ? `Caching only kicks in for prompts of ${CACHE_MIN_TOKENS.toLocaleString()}+ tokens — increase input tokens to enable it.`
       : "";
   }
 
@@ -393,7 +392,7 @@
     update();
   });
   cacheRateEl.addEventListener("input", () => {
-    state.cachePrefix = Number(cacheRateEl.value);
+    state.cacheShare = Number(cacheRateEl.value) / 100;
     refreshCacheUI();
     update();
   });
