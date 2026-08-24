@@ -120,10 +120,12 @@ code {
   padding: 6px 14px;
   border-radius: calc(var(--radius) - 3px);
   cursor: pointer;
+  min-width: 76px;      /* keep size stable when active bolds the label */
+  text-align: center;
 }
 .seg:hover { color: var(--text); }
 .seg.active { background: var(--primary); color: var(--primary-foreground); font-weight: 600; }
-.segmented.small .seg { padding: 4px 10px; font-size: 0.85rem; }
+.segmented.small .seg { padding: 4px 10px; font-size: 0.85rem; min-width: 96px; }
 
 .inputs {
   display: grid;
