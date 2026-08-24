@@ -94,7 +94,7 @@
   }
 
   function withoutCacheLineHTML(m) {
-    if (!cacheApplies(m)) return "";
+    if (!cacheApplies(m) || cachedTokens() === 0) return "";
     return `<div class="cache-line">Without caching: ${fmtMoney(standardMonthlyCost(m))}</div>`;
   }
 
@@ -186,6 +186,7 @@
         <div class="detail-cost">
           <span class="stat-label">Your monthly cost</span>
           <span class="stat-value cost">${fmtMoney(monthlyCost(m))}</span>
+          ${withoutCacheLineHTML(m)}
         </div>
       </div>
       <p class="description">${m.description}</p>
@@ -224,8 +225,8 @@
       ["", `<span class="model-id">${a.id}</span> <span class="provider">${a.provider}</span>`,
            `<span class="model-id">${b.id}</span> <span class="provider">${b.provider}</span>`],
       ["Monthly cost", `<span class="cmp-cost">${fmtMoney(monthlyCost(a))}</span>`, `<span class="cmp-cost">${fmtMoney(monthlyCost(b))}</span>`],
-      // only meaningful when caching is on: shows the uncached baseline
-      ...(state.cacheOn ? [["Without caching", withoutCell(a), withoutCell(b)]] : []),
+      // only meaningful when caching is on with real savings: the uncached baseline
+      ...(state.cacheOn && cachedTokens() > 0 ? [["Without caching", withoutCell(a), withoutCell(b)]] : []),
       ["Description", a.description, b.description],
       ["Context", fmtContext(a.context), fmtContext(b.context)],
       ["Quality", quality(a), quality(b)],
