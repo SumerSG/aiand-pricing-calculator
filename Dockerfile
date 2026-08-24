@@ -2,6 +2,7 @@
 FROM nginx:1.27-alpine
 
 COPY index.html styles.css app.js data.js /usr/share/nginx/html/
+COPY samples /usr/share/nginx/html/samples
 
 # Stamp cache-busting version at build time (same as the Pages workflow)
 RUN sed -i "s/__BUILD__/$(date +%s)/g" /usr/share/nginx/html/index.html

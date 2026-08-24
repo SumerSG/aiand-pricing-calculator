@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tip Calculator — sample app</title>
+<style>
+  body { font-family: -apple-system, system-ui, sans-serif; max-width: 380px; margin: 48px auto; padding: 0 16px; color: #1c1c1e; }
+  h1 { font-size: 1.3rem; }
+  label { display: block; margin: 14px 0 4px; font-size: 0.9rem; color: #555; }
+  input, select { width: 100%; padding: 10px; border: 1px solid #d1d1d6; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
+  .result { margin-top: 22px; padding: 16px; background: #f2f2f7; border-radius: 12px; }
+  .row { display: flex; justify-content: space-between; padding: 4px 0; }
+  .total { font-weight: 700; font-size: 1.15rem; border-top: 1px solid #d1d1d6; margin-top: 8px; padding-top: 8px; }
+</style>
+</head>
+<body>
+  <h1>Tip Calculator</h1>
+  <label for="bill">Bill amount ($)</label>
+  <input id="bill" type="number" min="0" step="0.01" value="86.40" />
+  <label for="tip">Tip percentage</label>
+  <select id="tip">
+    <option value="15">15%</option>
+    <option value="18" selected>18%</option>
+    <option value="20">20%</option>
+    <option value="25">25%</option>
+  </select>
+  <label for="split">Split between</label>
+  <input id="split" type="number" min="1" step="1" value="3" />
+  <div class="result">
+    <div class="row"><span>Tip</span><span id="tipAmt">$0.00</span></div>
+    <div class="row"><span>Total</span><span id="totalAmt">$0.00</span></div>
+    <div class="row total"><span>Per person</span><span id="perPerson">$0.00</span></div>
+  </div>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const money = (n) => "$" + n.toFixed(2);
+  function calc() {
+    const bill = parseFloat($("bill").value) || 0;
+    const tipPct = parseFloat($("tip").value) / 100;
+    const people = Math.max(1, parseInt($("split").value) || 1);
+    const tip = bill * tipPct;
+    $("tipAmt").textContent = money(tip);
+    $("totalAmt").textContent = money(bill + tip);
+    $("perPerson").textContent = money((bill + tip) / people);
+  }
+  ["bill", "tip", "split"].forEach((id) => $(id).addEventListener("input", calc));
+  calc();
+</script>
+</body>
+</html>

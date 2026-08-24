@@ -1,0 +1,36 @@
+{
+  "session_id": "chat_9f31c2",
+  "model": "deepseek-ai/deepseek-v4-flash",
+  "resolved": true,
+  "messages": [
+    {
+      "role": "user",
+      "content": "I can't log in \u2014 it says my password is wrong but I just changed it yesterday."
+    },
+    {
+      "role": "assistant",
+      "content": "Sorry for the trouble! A password change can take a few minutes to sync. First, make sure Caps Lock is off and try again. If it still fails, I can send a fresh reset link \u2014 shall I?"
+    },
+    {
+      "role": "user",
+      "content": "Yes please, send the link."
+    },
+    {
+      "role": "assistant",
+      "content": "Done \u2014 a reset link is on its way to your email (valid for 30 minutes). If it doesn't arrive within 2 minutes, check spam or let me know and I'll verify the address on file."
+    },
+    {
+      "role": "user",
+      "content": "Got it, I'm in now. Thanks!"
+    },
+    {
+      "role": "assistant",
+      "content": "You're welcome! For security, consider enabling two-factor authentication in Settings \u2192 Security. Anything else I can help with?"
+    }
+  ],
+  "resolution": {
+    "category": "account_access",
+    "escalated": false,
+    "csat": 5
+  }
+}

@@ -201,17 +201,18 @@ const MODELS = [
 ];
 
 // Quick example presets: per-call token usage + monthly call volume
+// sample: file in samples/ offered by the "Download sample" button
 const PRESETS = {
-  chatbot:    { label: "Chatbot",             inputTokens: 1_000,  outputTokens: 300,   callsPerMonth: 20_000 },
-  code:       { label: "Code Assistant",      inputTokens: 5_000,  outputTokens: 1_500, callsPerMonth: 5_000 },
-  docs:       { label: "Doc Analysis",        inputTokens: 30_000, outputTokens: 2_000, callsPerMonth: 1_000 },
-  content:    { label: "Content Gen",         inputTokens: 1_500,  outputTokens: 3_000, callsPerMonth: 3_000 },
-  ppt:        { label: "10-Page PPT",         inputTokens: 2_000,  outputTokens: 3_500, callsPerMonth: 30 },
-  financial:  { label: "Financial Statement", inputTokens: 40_000, outputTokens: 1_500, callsPerMonth: 100 },
-  buildapp:   { label: "Build an App",        inputTokens: 8_000,  outputTokens: 4_000, callsPerMonth: 500 },
-  email:      { label: "Email Campaign",      inputTokens: 600,    outputTokens: 350,   callsPerMonth: 2_000 },
-  contract:   { label: "Contract Review",     inputTokens: 25_000, outputTokens: 2_000, callsPerMonth: 60 },
-  translate:  { label: "Translate a Doc",     inputTokens: 6_000,  outputTokens: 6_000, callsPerMonth: 200 },
+  chatbot:    { label: "Chatbot",             inputTokens: 1_000,  outputTokens: 300,   callsPerMonth: 20_000, sample: "07-chatbot-transcript.json" },
+  code:       { label: "Code Assistant",      inputTokens: 5_000,  outputTokens: 1_500, callsPerMonth: 5_000,  sample: "08-code-assistant-example.py" },
+  docs:       { label: "Doc Analysis",        inputTokens: 30_000, outputTokens: 2_000, callsPerMonth: 1_000,  sample: "09-doc-analysis-summary.txt" },
+  content:    { label: "Content Gen",         inputTokens: 1_500,  outputTokens: 3_000, callsPerMonth: 3_000,  sample: "10-content-gen-blog-post.md" },
+  ppt:        { label: "10-Page PPT",         inputTokens: 2_000,  outputTokens: 3_500, callsPerMonth: 30,     sample: "01-ten-page-ppt.pptx" },
+  financial:  { label: "Financial Statement", inputTokens: 40_000, outputTokens: 1_500, callsPerMonth: 100,    sample: "02-financial-statement.xlsx" },
+  buildapp:   { label: "Build an App",        inputTokens: 8_000,  outputTokens: 4_000, callsPerMonth: 500,    sample: "03-tip-calculator.html" },
+  email:      { label: "Email Campaign",      inputTokens: 600,    outputTokens: 350,   callsPerMonth: 2_000,  sample: "04-email-campaign.eml" },
+  contract:   { label: "Contract Review",     inputTokens: 25_000, outputTokens: 2_000, callsPerMonth: 60,     sample: "05-contract-review.docx" },
+  translate:  { label: "Translate a Doc",     inputTokens: 6_000,  outputTokens: 6_000, callsPerMonth: 200,    sample: "06-translated-release-notes-ja.md" },
 };
 
 // Approximate conversion factors (industry heuristics)

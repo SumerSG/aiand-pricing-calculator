@@ -1,0 +1,17 @@
+DOC ANALYSIS SUMMARY — Sample Output
+Source: "2026 Mid-Market SaaS Support Benchmarks" (34-page PDF)
+
+KEY FINDINGS
+1. Median first-response time: 9.4h (down from 11.2h in 2024).
+2. Teams using AI deflection resolve 41% more tickets per agent.
+3. 42% of inbound tickets are repetitive how-to questions.
+4. CSAT correlates most strongly with first-response time (r = 0.71).
+
+METHOD NOTES
+- 412 companies surveyed, 50–1,000 employees.
+- Ticket data normalized across Zendesk/Intercom exports.
+
+QUOTABLE
+"Speed of first reply, not resolution quality, predicted CSAT most strongly."
+
+Generated as a sample of the "Doc Analysis" preset (30K input / 2K output tokens).

@@ -11,6 +11,7 @@
     outputTokens: 500,
     callsPerMonth: 10_000,
     slots: ["deepseek-ai/deepseek-v4-flash"],
+    activePreset: null,
   };
 
   // ---------- unit conversion ----------
@@ -266,8 +267,45 @@
   wireToggle("unitToggle", "unit", refreshFieldValues);
   wireToggle("sortToggle", "sort", render);
 
-  // ---------- presets ----------
+  // ---------- presets + sample download ----------
   const presetWrap = document.getElementById("presetButtons");
+  const sampleWrap = document.getElementById("sampleDownload");
+
+  function fileExt(name) {
+    return name.slice(name.lastIndexOf(".") + 1);
+  }
+
+  function renderSampleButton() {
+    sampleWrap.innerHTML = "";
+    const p = state.activePreset ? PRESETS[state.activePreset] : null;
+
+    if (p && p.sample) {
+      const a = document.createElement("a");
+      a.className = "sample-btn";
+      a.href = `samples/${p.sample}`;
+      a.setAttribute("download", p.sample);
+      a.textContent = `↓ Download sample (.${fileExt(p.sample)})`;
+      sampleWrap.appendChild(a);
+
+      const note = document.createElement("span");
+      note.className = "sample-note";
+      note.textContent = `Example output for the "${p.label}" preset`;
+      sampleWrap.appendChild(note);
+    } else {
+      const hint = document.createElement("span");
+      hint.className = "sample-note";
+      hint.textContent = "Pick a quick example above to download a sample output.";
+      sampleWrap.appendChild(hint);
+    }
+
+    const all = document.createElement("a");
+    all.className = "sample-all";
+    all.href = "samples/all-samples.zip";
+    all.setAttribute("download", "all-samples.zip");
+    all.textContent = "All samples (.zip)";
+    sampleWrap.appendChild(all);
+  }
+
   for (const [key, p] of Object.entries(PRESETS)) {
     const btn = document.createElement("button");
     btn.className = "preset";
@@ -275,10 +313,13 @@
     btn.addEventListener("click", () => {
       state.unit = "tokens";
       document.querySelectorAll('#unitToggle .seg').forEach((b) => b.classList.toggle("active", b.dataset.unit === "tokens"));
+      state.activePreset = key;
+      presetWrap.querySelectorAll(".preset").forEach((b) => b.classList.toggle("active", b === btn));
       state.inputTokens = p.inputTokens;
       state.outputTokens = p.outputTokens;
       state.callsPerMonth = p.callsPerMonth;
       refreshFieldValues();
+      renderSampleButton();
       update();
     });
     presetWrap.appendChild(btn);
@@ -293,5 +334,6 @@
 
   // ---------- init ----------
   refreshFieldValues();
+  renderSampleButton();
   update();
 })();

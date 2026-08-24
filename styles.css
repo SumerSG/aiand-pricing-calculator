@@ -156,7 +156,24 @@ code {
   cursor: pointer;
 }
 .preset:hover { border-color: var(--accent); color: var(--accent); }
+.preset.active { background: var(--primary); color: var(--primary-foreground); border-color: transparent; font-weight: 600; }
 .preset-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Sample download */
+.sample-download { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.sample-btn {
+  display: inline-block;
+  background: var(--accent-strong);
+  color: oklch(98.5% 0 0);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: var(--radius);
+  text-decoration: none;
+}
+.sample-btn:hover { filter: brightness(1.12); text-decoration: none; }
+.sample-note { color: var(--muted); font-size: 0.82rem; }
+.sample-all { font-size: 0.85rem; margin-left: auto; }
 
 /* Model picker */
 .model-picker { margin-bottom: 28px; }

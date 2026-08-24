@@ -1,0 +1,25 @@
+From: ScaleFlow <hello@scaleflow.example>
+To: customer@example.com
+Subject: Cut your first-response time from 9 hours to 9 seconds
+Date: Mon, 24 Aug 2026 10:00:00 +0000
+MIME-Version: 1.0
+Content-Type: text/html; charset=UTF-8
+
+<html>
+<body style="font-family: -apple-system, system-ui, sans-serif; max-width: 560px; margin: 0 auto; color: #1c1c1e;">
+  <h2>Your support queue, on autopilot</h2>
+  <p>Hi there,</p>
+  <p>42% of support tickets are repetitive how-to questions. ScaleFlow's AI agent
+     resolves them end-to-end — so your team spends time on the conversations that
+     actually need a human.</p>
+  <ul>
+    <li>Deploys in under a day (Zendesk &amp; Intercom native)</li>
+    <li>61% of tier-1 tickets resolved with zero human touch</li>
+    <li>Pay per resolution, not per seat</li>
+  </ul>
+  <p><a href="https://scaleflow.example/demo"
+        style="background:#2563eb;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;">
+        Book a 15-minute demo</a></p>
+  <p style="color:#8e8e93;font-size:12px;">ScaleFlow Inc. · Unsubscribe anytime</p>
+</body>
+</html>
