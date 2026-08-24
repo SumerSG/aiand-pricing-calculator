@@ -143,7 +143,9 @@
           </div>
         </div>
         ${cacheLineHTML(m)}
-        <div class="caps">${m.capabilities.map((c) => `<span class="cap">${c}</span>`).join("")}</div>
+        <div class="caps">${m.cachedInputPer1M != null
+          ? '<span class="cap cacheable">caching</span>'
+          : '<span class="cap no-cache">no caching</span>'}${m.capabilities.map((c) => `<span class="cap">${c}</span>`).join("")}</div>
       `;
       card.addEventListener("click", () => {
         state.slots[0] = m.id;
@@ -368,12 +370,13 @@
   const cacheNoteEl = document.getElementById("cacheNote");
 
   function refreshCacheUI() {
-    cacheRateEl.disabled = !state.cacheOn;
+    const tooSmall = state.inputTokens < CACHE_MIN_TOKENS;
+    cacheToggleEl.disabled = tooSmall;
+    cacheRateEl.disabled = !state.cacheOn || tooSmall;
     cacheValueEl.textContent = `${Math.round(state.cacheHit * 100)}% hit rate`;
-    cacheNoteEl.textContent =
-      state.cacheOn && state.inputTokens < CACHE_MIN_TOKENS
-        ? `Caching applies to prompts of ${CACHE_MIN_TOKENS.toLocaleString()}+ tokens — increase input tokens to see savings.`
-        : "";
+    cacheNoteEl.textContent = tooSmall
+      ? `Caching applies to prompts of ${CACHE_MIN_TOKENS.toLocaleString()}+ tokens — increase input tokens to enable it.`
+      : "";
   }
 
   cacheToggleEl.addEventListener("change", () => {
