@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ai&amp; Pricing Calculator</title>
+  <meta name="description" content="Calculate monthly ai& inference costs across models. Compare per-token pricing with Theozard quality scores." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <span class="logo">ai&amp;</span>
+      <span class="header-sub">Pricing Calculator</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>ai&amp; Pricing Calculator</h1>
+      <p class="lede">
+        Estimate monthly costs for every model on the
+        <a href="https://docs.aiand.com/models/catalog/" target="_blank" rel="noopener">ai&amp; inference platform</a>.
+        Quality scores from <a href="https://theozard.com/models/text" target="_blank" rel="noopener">Theozard</a>.
+      </p>
+    </section>
+
+    <!-- Calculator controls -->
+    <section class="controls" id="calculator">
+      <div class="calc-by">
+        <span class="control-label">Calculate by</span>
+        <div class="segmented" role="tablist" id="unitToggle">
+          <button class="seg active" data-unit="tokens" role="tab">Tokens</button>
+          <button class="seg" data-unit="words" role="tab">Words</button>
+          <button class="seg" data-unit="chars" role="tab">Characters</button>
+        </div>
+      </div>
+
+      <div class="inputs">
+        <label class="field">
+          <span id="inputLabel">Input Tokens <em>(per call)</em></span>
+          <input type="number" id="inputTokens" min="0" step="any" value="1000000" />
+        </label>
+        <label class="field">
+          <span id="outputLabel">Output Tokens <em>(per call)</em></span>
+          <input type="number" id="outputTokens" min="0" step="any" value="500000" />
+        </label>
+        <label class="field">
+          <span>API Calls / Month</span>
+          <input type="number" id="callsPerMonth" min="0" step="any" value="1" />
+        </label>
+      </div>
+
+      <div class="presets">
+        <span class="control-label">Quick examples:</span>
+        <div class="preset-buttons" id="presetButtons"></div>
+      </div>
+
+      <div class="sort-row">
+        <span class="control-label">Sort:</span>
+        <div class="segmented small" id="sortToggle">
+          <button class="seg active" data-sort="quality">Quality</button>
+          <button class="seg" data-sort="popularity">Popularity</button>
+          <button class="seg" data-sort="price">Price</button>
+          <button class="seg" data-sort="cost">Monthly Cost</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results -->
+    <section id="results" class="results"></section>
+
+    <section class="notes">
+      <h2>How cost is calculated</h2>
+      <pre class="formula">monthly_cost = calls_per_month × (input_tokens / 1M × input_price + output_tokens / 1M × output_price)</pre>
+      <p>
+        Prices are USD per 1M tokens, from the
+        <a href="https://docs.aiand.com/models/pricing/" target="_blank" rel="noopener">ai&amp; pricing docs</a>.
+        ai&amp; bills against a prepaid credit balance, deducting atomically when each request completes.
+        Prompt caching (automatic on prompts ≥1,024 tokens) can reduce input costs further.
+      </p>
+      <p>
+        Quality and popularity are the Theozard quality score and OpenRouter popularity rank from the
+        <a href="https://theozard.com/models/text" target="_blank" rel="noopener">Theozard LLM Leaderboard</a> —
+        <span class="dash">—</span> means the model isn't listed there.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      Unofficial calculator. Not affiliated with ai&amp;, Theozard, or CostGoat.
+      Prices may lag the live catalog — source of truth is <code>GET https://api.aiand.com/v1/models</code>.
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
