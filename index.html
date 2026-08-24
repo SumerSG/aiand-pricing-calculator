@@ -58,16 +58,6 @@
         <span class="control-label">Quick examples:</span>
         <div class="preset-buttons" id="presetButtons"></div>
       </div>
-
-      <div class="sort-row">
-        <span class="control-label">Sort:</span>
-        <div class="segmented small" id="sortToggle">
-          <button class="seg active" data-sort="quality">Quality</button>
-          <button class="seg" data-sort="popularity">Popularity</button>
-          <button class="seg" data-sort="price">Price</button>
-          <button class="seg" data-sort="cost">Monthly Cost</button>
-        </div>
-      </div>
     </section>
 
     <!-- Model picker + details -->
@@ -80,7 +70,18 @@
     </section>
 
     <!-- Results -->
-    <h2 class="results-heading">Compare all models</h2>
+    <div class="results-header">
+      <h2 class="results-heading">Compare all models</h2>
+      <div class="sort-row">
+        <span class="control-label">Sort:</span>
+        <div class="segmented small" id="sortToggle">
+          <button class="seg active" data-sort="quality">Quality</button>
+          <button class="seg" data-sort="popularity">Popularity</button>
+          <button class="seg" data-sort="price">Price</button>
+          <button class="seg" data-sort="cost">Monthly Cost</button>
+        </div>
+      </div>
+    </div>
     <section id="results" class="results"></section>
 
     <section class="notes">

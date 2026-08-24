@@ -186,7 +186,16 @@ code {
 .detail-cols ul.bad li::marker { color: var(--destructive); }
 
 /* Results */
-.results-heading { font-size: 1.2rem; margin: 0 0 14px; letter-spacing: -0.01em; }
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.results-header .sort-row { gap: 8px; }
+.results-heading { font-size: 1.2rem; margin: 0; letter-spacing: -0.01em; }
 .results { display: grid; gap: 14px; }
 
 .card {
