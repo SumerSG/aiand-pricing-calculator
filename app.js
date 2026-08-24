@@ -380,7 +380,7 @@
     const tooSmall = state.inputTokens < CACHE_MIN_TOKENS;
     cacheToggleEl.disabled = tooSmall;
     cacheRateEl.disabled = !state.cacheOn || tooSmall;
-    cacheValueEl.textContent = `${Math.round(state.cacheShare * 100)}% of input repeats`;
+    cacheValueEl.textContent = `${Math.round(state.cacheShare * 100)}% of tokens repeat`;
     cacheNoteEl.textContent = tooSmall
       ? `Caching only kicks in for prompts of ${CACHE_MIN_TOKENS.toLocaleString()}+ tokens — increase input tokens to enable it.`
       : "";
