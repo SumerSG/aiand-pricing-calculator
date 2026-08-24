@@ -1,5 +1,22 @@
-/* Palette taken from https://console.aiand.com (shadcn neutral dark + blue accents) */
+/* Palettes taken from https://console.aiand.com (:root = light, .dark = dark) */
 :root {
+  --bg: oklch(100% 0 0);
+  --panel: oklch(100% 0 0);
+  --panel-2: oklch(97% 0 0);
+  --border: oklch(92.2% 0 0);
+  --input: oklch(92.2% 0 0);
+  --text: oklch(14.5% 0 0);
+  --muted: oklch(55.6% 0 0);
+  --primary: oklch(20.5% 0 0);
+  --primary-foreground: oklch(98.5% 0 0);
+  --accent: oklch(62.3% 0.214 259.815);        /* console chart blue */
+  --accent-strong: oklch(48.8% 0.243 264.376); /* console sidebar primary */
+  --success: oklch(52% 0.16 152);
+  --destructive: oklch(57.7% 0.245 27.325);
+  --radius: 0.625rem;
+}
+
+[data-theme="dark"] {
   --bg: oklch(14.5% 0 0);
   --panel: oklch(20.5% 0 0);
   --panel-2: oklch(26.9% 0 0);
@@ -9,11 +26,10 @@
   --muted: oklch(70.8% 0 0);
   --primary: oklch(92.2% 0 0);
   --primary-foreground: oklch(20.5% 0 0);
-  --accent: oklch(62.3% 0.214 259.815);        /* console chart blue */
-  --accent-strong: oklch(48.8% 0.243 264.376); /* console sidebar primary */
+  --accent: oklch(62.3% 0.214 259.815);
+  --accent-strong: oklch(62.3% 0.214 259.815);
   --success: oklch(74% 0.14 152);
   --destructive: oklch(70.4% 0.191 22.216);
-  --radius: 0.625rem;
 }
 
 * { box-sizing: border-box; }
@@ -43,9 +59,28 @@ code {
   border-bottom: 1px solid var(--border);
   padding: 14px 0;
 }
-.header-inner { display: flex; align-items: baseline; gap: 12px; }
+.header-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand { display: flex; align-items: baseline; gap: 12px; }
 .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
 .header-sub { color: var(--muted); font-size: 0.95rem; }
+
+/* Theme toggle */
+.theme-toggle {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  padding: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.theme-toggle svg { width: 16px; height: 16px; display: block; }
+[data-theme="light"] .icon-sun { display: none; }
+[data-theme="dark"] .icon-moon { display: none; }
 
 /* Hero */
 .hero { padding: 40px 0 8px; }
