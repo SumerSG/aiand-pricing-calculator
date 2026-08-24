@@ -117,7 +117,70 @@ code {
 .preset:hover { border-color: var(--accent); color: var(--accent); }
 .preset-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
 
+/* Model picker */
+.model-picker {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.model-picker select {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.95rem;
+  padding: 10px 12px;
+  width: 100%;
+  cursor: pointer;
+}
+.model-picker select:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+
+.model-detail {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.detail-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.detail-head .provider { margin-left: 10px; }
+.detail-cost { text-align: right; display: grid; gap: 2px; }
+.detail-cost .cost { font-size: 1.4rem; }
+.description { color: var(--text); margin: 0 0 14px; max-width: 70ch; }
+.detail-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin-bottom: 16px;
+}
+.detail-stats strong { color: var(--text); font-weight: 600; }
+.detail-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+.detail-cols h3 {
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.detail-cols ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.9rem; }
+.detail-cols ul.good li::marker { color: var(--accent-2); }
+.detail-cols ul.bad li::marker { color: #f87171; }
+
 /* Results */
+.results-heading { font-size: 1.2rem; margin: 0 0 14px; letter-spacing: -0.01em; }
 .results { display: grid; gap: 14px; }
 
 .card {
@@ -125,7 +188,11 @@ code {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 16px 20px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
 }
+.card:hover { border-color: var(--accent); }
+.card.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 .card-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
 .model-id { font-weight: 700; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.98rem; }
 .provider { color: var(--muted); font-size: 0.85rem; }

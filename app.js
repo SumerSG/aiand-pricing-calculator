@@ -5,9 +5,10 @@
   const state = {
     unit: "tokens",      // tokens | words | chars
     sort: "quality",     // quality | popularity | price | cost
-    inputTokens: 1_000_000,
-    outputTokens: 500_000,
-    callsPerMonth: 1,
+    inputTokens: 2_000,
+    outputTokens: 500,
+    callsPerMonth: 10_000,
+    selectedId: "deepseek-ai/deepseek-v4-flash",
   };
 
   // ---------- unit conversion ----------
@@ -62,14 +63,14 @@
 
   const fmtInt = (n) => Math.round(n).toLocaleString("en-US");
 
-  // ---------- rendering ----------
+  // ---------- results grid ----------
   const resultsEl = document.getElementById("results");
 
   function render() {
     resultsEl.innerHTML = "";
     for (const m of sortedModels()) {
       const card = document.createElement("article");
-      card.className = "card";
+      card.className = "card" + (m.id === state.selectedId ? " selected" : "");
       card.innerHTML = `
         <div class="card-head">
           <span class="model-id">${m.id}</span>
@@ -99,8 +100,74 @@
         </div>
         <div class="caps">${m.capabilities.map((c) => `<span class="cap">${c}</span>`).join("")}</div>
       `;
+      card.addEventListener("click", () => selectModel(m.id));
       resultsEl.appendChild(card);
     }
+  }
+
+  // ---------- model picker + detail panel ----------
+  const selectEl = document.getElementById("modelSelect");
+  const detailEl = document.getElementById("modelDetail");
+
+  function buildSelect() {
+    for (const m of MODELS) {
+      const opt = document.createElement("option");
+      opt.value = m.id;
+      const price =
+        m.inputPer1M === 0 && m.outputPer1M === 0
+          ? "Free"
+          : `${fmtPrice(m.inputPer1M)} in / ${fmtPrice(m.outputPer1M)} out per 1M`;
+      opt.textContent = `${m.id} — ${price}`;
+      selectEl.appendChild(opt);
+    }
+    selectEl.value = state.selectedId;
+  }
+
+  function selectModel(id) {
+    state.selectedId = id;
+    selectEl.value = id;
+    update();
+  }
+
+  function renderDetail() {
+    const m = MODELS.find((x) => x.id === state.selectedId);
+    if (!m) return;
+    detailEl.innerHTML = `
+      <div class="detail-head">
+        <div>
+          <span class="model-id">${m.id}</span>
+          <span class="provider">${m.provider}</span>
+        </div>
+        <div class="detail-cost">
+          <span class="stat-label">Your monthly cost</span>
+          <span class="stat-value cost">${fmtMoney(monthlyCost(m))}</span>
+        </div>
+      </div>
+      <p class="description">${m.description}</p>
+      <div class="detail-stats">
+        <span><strong>Context:</strong> ${fmtContext(m.context)}</span>
+        <span><strong>Quality:</strong> ${m.quality ?? "—"}${m.quality ? " (Theozard)" : ""}</span>
+        <span><strong>Popularity:</strong> ${m.popularity != null ? "#" + m.popularity + " (OpenRouter)" : "—"}</span>
+        <span><strong>Price:</strong> ${m.inputPer1M === 0 && m.outputPer1M === 0 ? "Free" : `${fmtPrice(m.inputPer1M)} in / ${fmtPrice(m.outputPer1M)} out per 1M`}</span>
+      </div>
+      <div class="detail-cols">
+        <div>
+          <h3>Specialties</h3>
+          <ul class="good">${m.specialties.map((s) => `<li>${s}</li>`).join("")}</ul>
+        </div>
+        <div>
+          <h3>Limitations</h3>
+          <ul class="bad">${m.limitations.map((s) => `<li>${s}</li>`).join("")}</ul>
+        </div>
+      </div>
+    `;
+  }
+
+  selectEl.addEventListener("change", () => selectModel(selectEl.value));
+
+  function update() {
+    render();
+    renderDetail();
   }
 
   // ---------- inputs ----------
@@ -122,15 +189,15 @@
 
   inputEl.addEventListener("input", () => {
     state.inputTokens = Math.max(0, displayToTokens(Number(inputEl.value) || 0));
-    render();
+    update();
   });
   outputEl.addEventListener("input", () => {
     state.outputTokens = Math.max(0, displayToTokens(Number(outputEl.value) || 0));
-    render();
+    update();
   });
   callsEl.addEventListener("input", () => {
     state.callsPerMonth = Math.max(0, Number(callsEl.value) || 0);
-    render();
+    update();
   });
 
   // ---------- segmented toggles ----------
@@ -162,12 +229,13 @@
       state.outputTokens = p.outputTokens;
       state.callsPerMonth = p.callsPerMonth;
       refreshFieldValues();
-      render();
+      update();
     });
     presetWrap.appendChild(btn);
   }
 
   // ---------- init ----------
+  buildSelect();
   refreshFieldValues();
-  render();
+  update();
 })();

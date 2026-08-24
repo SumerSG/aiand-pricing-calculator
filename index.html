@@ -39,15 +39,15 @@
       <div class="inputs">
         <label class="field">
           <span id="inputLabel">Input Tokens <em>(per call)</em></span>
-          <input type="number" id="inputTokens" min="0" step="any" value="1000000" />
+          <input type="number" id="inputTokens" min="0" step="any" value="2000" />
         </label>
         <label class="field">
           <span id="outputLabel">Output Tokens <em>(per call)</em></span>
-          <input type="number" id="outputTokens" min="0" step="any" value="500000" />
+          <input type="number" id="outputTokens" min="0" step="any" value="500" />
         </label>
         <label class="field">
           <span>API Calls / Month</span>
-          <input type="number" id="callsPerMonth" min="0" step="any" value="1" />
+          <input type="number" id="callsPerMonth" min="0" step="any" value="10000" />
         </label>
       </div>
 
@@ -67,7 +67,17 @@
       </div>
     </section>
 
+    <!-- Model picker + details -->
+    <section class="model-picker" id="modelPicker">
+      <label class="field">
+        <span>Model</span>
+        <select id="modelSelect"></select>
+      </label>
+      <article class="model-detail" id="modelDetail"></article>
+    </section>
+
     <!-- Results -->
+    <h2 class="results-heading">Compare all models</h2>
     <section id="results" class="results"></section>
 
     <section class="notes">
