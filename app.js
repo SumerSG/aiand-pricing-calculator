@@ -238,16 +238,27 @@
     outputLabel.innerHTML = `Output ${UNIT_WORDS[state.unit]} <em>(per call)</em>`;
   }
 
+  // Editing inputs manually detaches the active preset and its sample download
+  function clearPreset() {
+    if (!state.activePreset) return;
+    state.activePreset = null;
+    presetWrap.querySelectorAll(".preset").forEach((b) => b.classList.remove("active"));
+    renderSampleButton();
+  }
+
   inputEl.addEventListener("input", () => {
     state.inputTokens = Math.max(0, displayToTokens(Number(inputEl.value) || 0));
+    clearPreset();
     update();
   });
   outputEl.addEventListener("input", () => {
     state.outputTokens = Math.max(0, displayToTokens(Number(outputEl.value) || 0));
+    clearPreset();
     update();
   });
   callsEl.addEventListener("input", () => {
     state.callsPerMonth = Math.max(0, Number(callsEl.value) || 0);
+    clearPreset();
     update();
   });
 

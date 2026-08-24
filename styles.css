@@ -60,8 +60,8 @@ code {
   padding: 14px 0;
 }
 .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.brand { display: flex; align-items: baseline; gap: 12px; }
-.logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.logo-mark { height: 26px; width: auto; display: block; color: var(--text); }
 .header-sub { color: var(--muted); font-size: 0.95rem; }
 
 /* Theme toggle */

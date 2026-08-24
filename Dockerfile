@@ -1,7 +1,7 @@
 # Static site served by nginx on Build.io (listens on $PORT)
 FROM nginx:1.27-alpine
 
-COPY index.html styles.css app.js data.js /usr/share/nginx/html/
+COPY index.html styles.css app.js data.js favicon.png /usr/share/nginx/html/
 COPY samples /usr/share/nginx/html/samples
 
 # Stamp cache-busting version at build time (same as the Pages workflow)
