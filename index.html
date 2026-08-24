@@ -92,11 +92,11 @@
           <input type="checkbox" id="cacheToggle" />
           <span>Prompt caching</span>
         </label>
-        <input type="range" id="cacheRate" min="0" max="90" step="5" value="60" disabled />
-        <span class="cache-value" id="cacheValue">60% hit rate</span>
+        <input type="range" id="cacheRate" min="0" max="10240" step="128" value="1536" disabled />
+        <span class="cache-value" id="cacheValue">1,536 tokens</span>
         <span class="info-icon" role="img" aria-label="About prompt caching">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5"/><path d="M12 8h.01"/></svg>
-          <span class="tooltip">ai&amp; automatically detects repeated prompt prefixes and bills the reused portion at the model's cached input rate. Applies to prompts of 1,024 tokens or more, with the cached prefix counted in 128-token increments. Reuse lasts ~10 minutes and is scoped to your organization. No code changes needed.</span>
+          <span class="tooltip">ai&amp; automatically detects repeated prompt prefixes and bills the reused portion at the model's cached input rate — the common pattern is a stable system prompt (and tools) followed by a growing conversation. Set how many leading tokens repeat across your calls. Prompts of 1,024 tokens or more qualify; the cached prefix is counted in 128-token increments (capped at your input size). Reuse lasts ~10 minutes and is scoped to your organization. No code changes needed.</span>
         </span>
         <span class="cache-note" id="cacheNote"></span>
       </div>
@@ -132,9 +132,10 @@
         deducting atomically when each request completes.
       </p>
       <p>
-        Enable <strong>Prompt caching</strong> above to estimate savings: repeated prompt prefixes
-        (≥1,024 tokens, counted in 128-token increments, ~10-minute reuse window) bill at each
-        model's cached input rate. All models in the catalog currently offer a cached rate.
+        Enable <strong>Prompt caching</strong> above to estimate savings: set the size of the stable
+        leading prefix your calls share (system prompt, tools, conversation history). That prefix
+        bills at each model's cached input rate — prompts of ≥1,024 tokens qualify, counted in
+        128-token increments, with ~10-minute reuse. All models in the catalog currently offer a cached rate.
       </p>
       <p>
         Quality and popularity are the Theozard quality score and OpenRouter popularity rank from the

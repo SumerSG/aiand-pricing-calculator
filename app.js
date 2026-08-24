@@ -30,7 +30,7 @@
     slots: ["deepseek-ai/deepseek-v4-flash"],
     activePreset: null,
     cacheOn: false,
-    cacheHit: 0.6,
+    cachePrefix: 1_536, // tokens of stable leading prefix reused across calls
   };
 
   // ---------- unit conversion ----------
@@ -55,13 +55,18 @@
     );
   }
 
-  function monthlyCost(model) {
+  function standardMonthlyCost(model) {
     return costPerCall(model) * state.callsPerMonth;
   }
 
+  // The headline cost figure: reflects caching whenever it is enabled and applicable
+  function monthlyCost(model) {
+    return cacheApplies(model) ? cachedMonthlyCost(model) : standardMonthlyCost(model);
+  }
+
   // ---------- prompt caching ----------
-  // Docs: prompts of 1,024+ tokens qualify; the cached prefix is counted in
-  // 128-token increments and bills at the model's cached_input_per_1m rate.
+  // Docs: prompts of 1,024+ tokens qualify; the reused leading prefix bills at
+  // the model's cached_input_per_1m rate, counted in 128-token increments.
   const CACHE_INCREMENT = 128;
 
   function cacheApplies(m) {
@@ -69,7 +74,8 @@
   }
 
   function cachedTokens() {
-    return Math.floor((state.inputTokens * state.cacheHit) / CACHE_INCREMENT) * CACHE_INCREMENT;
+    const maxCacheable = Math.floor(state.inputTokens / CACHE_INCREMENT) * CACHE_INCREMENT;
+    return Math.min(state.cachePrefix, maxCacheable);
   }
 
   function cachedMonthlyCost(model) {
@@ -83,14 +89,9 @@
     );
   }
 
-  function cacheSavings(m) {
-    const std = monthlyCost(m);
-    return std > 0 ? Math.round((1 - cachedMonthlyCost(m) / std) * 100) : 0;
-  }
-
-  function cacheLineHTML(m) {
+  function withoutCacheLineHTML(m) {
     if (!cacheApplies(m)) return "";
-    return `<div class="cache-line">With caching (${Math.round(state.cacheHit * 100)}% hit): <strong>${fmtMoney(cachedMonthlyCost(m))}</strong> <span class="save">−${cacheSavings(m)}%</span></div>`;
+    return `<div class="cache-line">Without caching: ${fmtMoney(standardMonthlyCost(m))}</div>`;
   }
 
   // ---------- sorting ----------
@@ -152,7 +153,7 @@
             <span class="stat-value cost">${fmtMoney(monthlyCost(m))}</span>
           </div>
         </div>
-        ${cacheLineHTML(m)}
+        ${withoutCacheLineHTML(m)}
         <div class="caps">${m.capabilities.map((c) => `<span class="cap">${c}</span>`).join("")}</div>
       `;
       card.addEventListener("click", () => {
@@ -212,17 +213,15 @@
           (m.cachedInputPer1M != null ? ` · ${fmtPrice(m.cachedInputPer1M)} cached` : "");
     const quality = (m) => (m.quality != null ? `${m.quality} (Theozard)` : "—");
     const popularity = (m) => (m.popularity != null ? `#${m.popularity} (OpenRouter)` : "—");
-    const cacheCell = (m) =>
-      cacheApplies(m)
-        ? `<span class="cmp-cost">${fmtMoney(cachedMonthlyCost(m))}</span> <span class="save">−${cacheSavings(m)}%</span>`
-        : "—";
+    const withoutCell = (m) => (cacheApplies(m) ? fmtMoney(standardMonthlyCost(m)) : "—");
     const list = (items, cls) => `<ul class="${cls}">${items.map((s) => `<li>${s}</li>`).join("")}</ul>`;
 
     const rows = [
       ["", `<span class="model-id">${a.id}</span> <span class="provider">${a.provider}</span>`,
            `<span class="model-id">${b.id}</span> <span class="provider">${b.provider}</span>`],
       ["Monthly cost", `<span class="cmp-cost">${fmtMoney(monthlyCost(a))}</span>`, `<span class="cmp-cost">${fmtMoney(monthlyCost(b))}</span>`],
-      ["With caching", cacheCell(a), cacheCell(b)],
+      // only meaningful when caching is on: shows the uncached baseline
+      ...(state.cacheOn ? [["Without caching", withoutCell(a), withoutCell(b)]] : []),
       ["Description", a.description, b.description],
       ["Context", fmtContext(a.context), fmtContext(b.context)],
       ["Quality", quality(a), quality(b)],
@@ -381,7 +380,8 @@
     const tooSmall = state.inputTokens < CACHE_MIN_TOKENS;
     cacheToggleEl.disabled = tooSmall;
     cacheRateEl.disabled = !state.cacheOn || tooSmall;
-    cacheValueEl.textContent = `${Math.round(state.cacheHit * 100)}% hit rate`;
+    const pct = state.inputTokens > 0 ? Math.round((cachedTokens() / state.inputTokens) * 100) : 0;
+    cacheValueEl.textContent = `${state.cachePrefix.toLocaleString()} tokens (${pct}%)`;
     cacheNoteEl.textContent = tooSmall
       ? `Caching applies to prompts of ${CACHE_MIN_TOKENS.toLocaleString()}+ tokens — increase input tokens to enable it.`
       : "";
@@ -393,7 +393,7 @@
     update();
   });
   cacheRateEl.addEventListener("input", () => {
-    state.cacheHit = Number(cacheRateEl.value) / 100;
+    state.cachePrefix = Number(cacheRateEl.value);
     refreshCacheUI();
     update();
   });
