@@ -9,8 +9,8 @@
   --muted: oklch(55.6% 0 0);
   --primary: oklch(20.5% 0 0);
   --primary-foreground: oklch(98.5% 0 0);
-  --accent: oklch(62.3% 0.214 259.815);        /* console chart blue */
-  --accent-strong: oklch(48.8% 0.243 264.376); /* console sidebar primary */
+  --accent: #c70007;        /* ai& brand red (aiand.com) */
+  --accent-strong: #c70007;
   --success: oklch(52% 0.16 152);
   --destructive: oklch(57.7% 0.245 27.325);
   --radius: 0.625rem;
@@ -26,8 +26,8 @@
   --muted: oklch(70.8% 0 0);
   --primary: oklch(92.2% 0 0);
   --primary-foreground: oklch(20.5% 0 0);
-  --accent: oklch(62.3% 0.214 259.815);
-  --accent-strong: oklch(62.3% 0.214 259.815);
+  --accent: #f4474a;        /* brighter tint of ai& red for dark backgrounds */
+  --accent-strong: #f4474a;
   --success: oklch(74% 0.14 152);
   --destructive: oklch(70.4% 0.191 22.216);
 }
