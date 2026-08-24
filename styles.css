@@ -1,13 +1,19 @@
+/* Palette taken from https://console.aiand.com (shadcn neutral dark + blue accents) */
 :root {
-  --bg: #0b0e14;
-  --panel: #131824;
-  --panel-2: #1a2130;
-  --border: #283042;
-  --text: #e6e9f0;
-  --muted: #8b94a7;
-  --accent: #7c9eff;
-  --accent-2: #4ade80;
-  --radius: 12px;
+  --bg: oklch(14.5% 0 0);
+  --panel: oklch(20.5% 0 0);
+  --panel-2: oklch(26.9% 0 0);
+  --border: oklch(100% 0 0 / 0.1);
+  --input: oklch(100% 0 0 / 0.15);
+  --text: oklch(98.5% 0 0);
+  --muted: oklch(70.8% 0 0);
+  --primary: oklch(92.2% 0 0);
+  --primary-foreground: oklch(20.5% 0 0);
+  --accent: oklch(62.3% 0.214 259.815);        /* console chart blue */
+  --accent-strong: oklch(48.8% 0.243 264.376); /* console sidebar primary */
+  --success: oklch(74% 0.14 152);
+  --destructive: oklch(70.4% 0.191 22.216);
+  --radius: 0.625rem;
 }
 
 * { box-sizing: border-box; }
@@ -16,7 +22,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: "Geist", "Geist Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.5;
 }
 
@@ -65,7 +71,7 @@ code {
   display: inline-flex;
   background: var(--panel-2);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   padding: 3px;
   gap: 2px;
 }
@@ -77,11 +83,11 @@ code {
   font: inherit;
   font-size: 0.9rem;
   padding: 6px 14px;
-  border-radius: 8px;
+  border-radius: calc(var(--radius) - 3px);
   cursor: pointer;
 }
 .seg:hover { color: var(--text); }
-.seg.active { background: var(--accent); color: #0b0e14; font-weight: 600; }
+.seg.active { background: var(--primary); color: var(--primary-foreground); font-weight: 600; }
 .segmented.small .seg { padding: 4px 10px; font-size: 0.85rem; }
 
 .inputs {
@@ -94,8 +100,8 @@ code {
 .field em { font-style: normal; opacity: 0.7; font-size: 0.8em; }
 .field input {
   background: var(--panel-2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  border: 1px solid var(--input);
+  border-radius: var(--radius);
   color: var(--text);
   font: inherit;
   padding: 10px 12px;
@@ -125,8 +131,8 @@ code {
 }
 .model-picker select {
   background: var(--panel-2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  border: 1px solid var(--input);
+  border-radius: var(--radius);
   color: var(--text);
   font: inherit;
   font-size: 0.95rem;
@@ -176,8 +182,8 @@ code {
   color: var(--muted);
 }
 .detail-cols ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.9rem; }
-.detail-cols ul.good li::marker { color: var(--accent-2); }
-.detail-cols ul.bad li::marker { color: #f87171; }
+.detail-cols ul.good li::marker { color: var(--success); }
+.detail-cols ul.bad li::marker { color: var(--destructive); }
 
 /* Results */
 .results-heading { font-size: 1.2rem; margin: 0 0 14px; letter-spacing: -0.01em; }
@@ -192,9 +198,9 @@ code {
   transition: border-color 0.15s ease;
 }
 .card:hover { border-color: var(--accent); }
-.card.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.card.selected { border-color: var(--accent-strong); box-shadow: 0 0 0 1px var(--accent-strong); }
 .card-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
-.model-id { font-weight: 700; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.98rem; }
+.model-id { font-weight: 700; font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.98rem; }
 .provider { color: var(--muted); font-size: 0.85rem; }
 
 .stats {
@@ -205,7 +211,7 @@ code {
 .stat { display: grid; gap: 2px; }
 .stat-label { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
 .stat-value { font-weight: 600; }
-.stat-value.cost { color: var(--accent-2); font-size: 1.15rem; }
+.stat-value.cost { color: var(--success); font-size: 1.15rem; }
 .dash { color: var(--muted); font-weight: 400; }
 
 .caps { margin-top: 12px; display: flex; gap: 6px; flex-wrap: wrap; }
@@ -223,7 +229,7 @@ code {
 .formula {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   padding: 14px 16px;
   overflow-x: auto;
   color: var(--text);
