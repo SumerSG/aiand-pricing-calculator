@@ -33,8 +33,7 @@
     callsPerMonth: 10_000,
     slots: ["deepseek-ai/deepseek-v4-flash"],
     activePreset: null,
-    cacheOn: false,
-    cacheShare: 0.6, // share of input tokens that repeat across calls
+    complexity: "medium", // low | medium | high — sets the assumed repeat share
   };
 
   // ---------- unit conversion ----------
@@ -69,17 +68,18 @@
   }
 
   // ---------- prompt caching ----------
-  // Docs: prompts of 1,024+ tokens qualify; the reused leading prefix bills at
-  // the model's cached_input_per_1m rate, counted in 128-token increments.
+  // Caching is automatic on ai& (no opt-in needed), so it is always assumed
+  // here. Docs: prompts of 1,024+ tokens qualify; the repeated portion bills
+  // at the model's cached_input_per_1m rate, counted in 128-token increments.
+  // How much repeats on average depends on task complexity (see TIERS).
   const CACHE_INCREMENT = 128;
 
   function cacheApplies(m) {
-    return state.cacheOn && state.inputTokens >= CACHE_MIN_TOKENS && m.cachedInputPer1M != null;
+    return state.inputTokens >= CACHE_MIN_TOKENS && m.cachedInputPer1M != null;
   }
 
   function cachedTokens() {
-    // docs: cached portion is counted in 128-token increments
-    return Math.floor((state.inputTokens * state.cacheShare) / CACHE_INCREMENT) * CACHE_INCREMENT;
+    return Math.floor((state.inputTokens * TIERS[state.complexity].share) / CACHE_INCREMENT) * CACHE_INCREMENT;
   }
 
   function cachedMonthlyCost(model) {
@@ -375,29 +375,27 @@
   wireToggle("unitToggle", "unit", refreshFieldValues);
   wireToggle("sortToggle", "sort", render);
 
-  // ---------- prompt caching controls ----------
-  const cacheToggleEl = document.getElementById("cacheToggle");
-  const cacheRateEl = document.getElementById("cacheRate");
-  const cacheValueEl = document.getElementById("cacheValue");
+  // ---------- task complexity control ----------
+  const complexityEl = document.getElementById("complexityToggle");
+  const tierShareEl = document.getElementById("tierShare");
   const cacheNoteEl = document.getElementById("cacheNote");
 
   function refreshCacheUI() {
-    const tooSmall = state.inputTokens < CACHE_MIN_TOKENS;
-    cacheToggleEl.disabled = tooSmall;
-    cacheRateEl.disabled = !state.cacheOn || tooSmall;
-    cacheValueEl.textContent = `${Math.round(state.cacheShare * 100)}% of tokens repeat`;
-    cacheNoteEl.textContent = tooSmall
-      ? `Caching only kicks in for prompts of ${CACHE_MIN_TOKENS.toLocaleString()}+ tokens — increase input tokens to enable it.`
-      : "";
+    const tier = TIERS[state.complexity];
+    complexityEl.querySelectorAll(".seg").forEach((b) =>
+      b.classList.toggle("active", b.dataset.tier === state.complexity)
+    );
+    tierShareEl.textContent = `≈${Math.round(tier.share * 100)}% of tokens repeat on average — ${tier.blurb}`;
+    cacheNoteEl.textContent =
+      state.inputTokens < CACHE_MIN_TOKENS
+        ? `Prompts under ${CACHE_MIN_TOKENS.toLocaleString()} tokens don't qualify for caching — no discount applied.`
+        : "";
   }
 
-  cacheToggleEl.addEventListener("change", () => {
-    state.cacheOn = cacheToggleEl.checked;
-    refreshCacheUI();
-    update();
-  });
-  cacheRateEl.addEventListener("input", () => {
-    state.cacheShare = Number(cacheRateEl.value) / 100;
+  complexityEl.addEventListener("click", (e) => {
+    const btn = e.target.closest(".seg");
+    if (!btn) return;
+    state.complexity = btn.dataset.tier;
     refreshCacheUI();
     update();
   });
@@ -441,23 +439,42 @@
     sampleWrap.appendChild(all);
   }
 
-  for (const [key, p] of Object.entries(PRESETS)) {
-    const btn = document.createElement("button");
-    btn.className = "preset";
-    btn.textContent = p.label;
-    btn.addEventListener("click", () => {
-      state.unit = "tokens";
-      document.querySelectorAll('#unitToggle .seg').forEach((b) => b.classList.toggle("active", b.dataset.unit === "tokens"));
-      state.activePreset = key;
-      presetWrap.querySelectorAll(".preset").forEach((b) => b.classList.toggle("active", b === btn));
-      state.inputTokens = p.inputTokens;
-      state.outputTokens = p.outputTokens;
-      state.callsPerMonth = p.callsPerMonth;
-      refreshFieldValues();
-      renderSampleButton();
-      update();
-    });
-    presetWrap.appendChild(btn);
+  // presets grouped into complexity buckets
+  for (const tierKey of ["low", "medium", "high"]) {
+    const tier = TIERS[tierKey];
+    const group = document.createElement("div");
+    group.className = "preset-group";
+
+    const label = document.createElement("div");
+    label.className = "preset-group-label";
+    label.textContent = `${tier.label} complexity · ≈${Math.round(tier.share * 100)}% repeat`;
+    group.appendChild(label);
+
+    const buttons = document.createElement("div");
+    buttons.className = "preset-buttons";
+    for (const [key, p] of Object.entries(PRESETS)) {
+      if (p.tier !== tierKey) continue;
+      const btn = document.createElement("button");
+      btn.className = "preset";
+      btn.textContent = p.label;
+      btn.addEventListener("click", () => {
+        state.unit = "tokens";
+        document.querySelectorAll('#unitToggle .seg').forEach((b) => b.classList.toggle("active", b.dataset.unit === "tokens"));
+        state.activePreset = key;
+        state.complexity = p.tier;
+        presetWrap.querySelectorAll(".preset").forEach((b) => b.classList.toggle("active", b === btn));
+        state.inputTokens = p.inputTokens;
+        state.outputTokens = p.outputTokens;
+        state.callsPerMonth = p.callsPerMonth;
+        refreshFieldValues();
+        renderSampleButton();
+        refreshCacheUI();
+        update();
+      });
+      buttons.appendChild(btn);
+    }
+    group.appendChild(buttons);
+    presetWrap.appendChild(group);
   }
 
   // ---------- theme toggle ----------

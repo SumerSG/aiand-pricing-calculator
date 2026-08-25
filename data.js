@@ -161,19 +161,36 @@ const EDITORIAL = {
   },
 };
 
-// Quick example presets: per-call token usage + monthly call volume
-// sample: file in samples/ offered by the "Download sample" button
+// Complexity tiers — how much of each call's input repeats on average.
+// ai& caches repeated prefixes automatically (prompts ≥1,024 tokens), so the
+// repeat share of a workload is what drives caching savings.
+// Shares below are measured against the live API by the benchmark project
+// (see https://github.com/SumerSG/aiand-cache-benchmark) — see BENCH_NOTE.
+// Shares MEASURED against the live ai& API (Aug 24–25, 2026 — 233 calls,
+// 5 models) by https://github.com/SumerSG/aiand-cache-benchmark
+const TIERS = {
+  low:    { share: 0.06, label: "Low",    blurb: "one-shot tasks — little repeats" },
+  medium: { share: 0.71, label: "Medium", blurb: "multi-turn chats — history repeats" },
+  high:   { share: 0.78, label: "High",   blurb: "agentic tool loops — every step repeats" },
+};
+const BENCH_NOTE = "Repeat shares measured on the live ai& API (233 calls, 5 models, Aug 24–25 2026)";
+
+// Quick example presets: per-call token usage + monthly call volume,
+// sorted into complexity buckets. sample: file in samples/ for download.
 const PRESETS = {
-  chatbot:    { label: "Chatbot",             inputTokens: 1_000,  outputTokens: 300,   callsPerMonth: 20_000, sample: "07-chatbot-transcript.json" },
-  code:       { label: "Code Assistant",      inputTokens: 5_000,  outputTokens: 1_500, callsPerMonth: 5_000,  sample: "08-code-assistant-example.py" },
-  docs:       { label: "Doc Analysis",        inputTokens: 30_000, outputTokens: 2_000, callsPerMonth: 1_000,  sample: "09-doc-analysis-summary.txt" },
-  content:    { label: "Content Gen",         inputTokens: 1_500,  outputTokens: 3_000, callsPerMonth: 3_000,  sample: "10-content-gen-blog-post.md" },
-  ppt:        { label: "10-Page PPT",         inputTokens: 2_000,  outputTokens: 3_500, callsPerMonth: 30,     sample: "01-ten-page-ppt.pptx" },
-  financial:  { label: "Financial Statement", inputTokens: 40_000, outputTokens: 1_500, callsPerMonth: 100,    sample: "02-financial-statement.xlsx" },
-  buildapp:   { label: "Build an App",        inputTokens: 8_000,  outputTokens: 4_000, callsPerMonth: 500,    sample: "03-tip-calculator.html" },
-  email:      { label: "Email Campaign",      inputTokens: 600,    outputTokens: 350,   callsPerMonth: 2_000,  sample: "04-email-campaign.eml" },
-  contract:   { label: "Contract Review",     inputTokens: 25_000, outputTokens: 2_000, callsPerMonth: 60,     sample: "05-contract-review.docx" },
-  translate:  { label: "Translate a Doc",     inputTokens: 6_000,  outputTokens: 6_000, callsPerMonth: 200,    sample: "06-translated-release-notes-ja.md" },
+  // low complexity — one-shot calls
+  translate:  { label: "Translate a Doc",     tier: "low",    inputTokens: 6_000,  outputTokens: 6_000, callsPerMonth: 200,    sample: "06-translated-release-notes-ja.md" },
+  email:      { label: "Email Campaign",      tier: "low",    inputTokens: 600,    outputTokens: 350,   callsPerMonth: 2_000,  sample: "04-email-campaign.eml" },
+  content:    { label: "Content Gen",         tier: "low",    inputTokens: 1_500,  outputTokens: 3_000, callsPerMonth: 3_000,  sample: "10-content-gen-blog-post.md" },
+  ppt:        { label: "10-Page PPT",         tier: "low",    inputTokens: 2_000,  outputTokens: 3_500, callsPerMonth: 30,     sample: "01-ten-page-ppt.pptx" },
+  financial:  { label: "Financial Statement", tier: "low",    inputTokens: 40_000, outputTokens: 1_500, callsPerMonth: 100,    sample: "02-financial-statement.xlsx" },
+  // medium complexity — multi-turn chats
+  chatbot:    { label: "Chatbot",             tier: "medium", inputTokens: 1_000,  outputTokens: 300,   callsPerMonth: 20_000, sample: "07-chatbot-transcript.json" },
+  docs:       { label: "Doc Analysis",        tier: "medium", inputTokens: 30_000, outputTokens: 2_000, callsPerMonth: 1_000,  sample: "09-doc-analysis-summary.txt" },
+  contract:   { label: "Contract Review",     tier: "medium", inputTokens: 25_000, outputTokens: 2_000, callsPerMonth: 60,     sample: "05-contract-review.docx" },
+  // high complexity — agentic tool loops
+  code:       { label: "Code Assistant",      tier: "high",   inputTokens: 5_000,  outputTokens: 1_500, callsPerMonth: 5_000,  sample: "08-code-assistant-example.py" },
+  buildapp:   { label: "Build an App",        tier: "high",   inputTokens: 8_000,  outputTokens: 4_000, callsPerMonth: 500,    sample: "03-tip-calculator.html" },
 };
 
 // Approximate conversion factors (industry heuristics)

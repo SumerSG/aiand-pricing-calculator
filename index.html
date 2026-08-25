@@ -82,21 +82,22 @@
 
       <div class="presets">
         <span class="control-label">Quick examples:</span>
-        <div class="preset-buttons" id="presetButtons"></div>
+        <div class="preset-groups" id="presetButtons"></div>
       </div>
 
       <div class="sample-download" id="sampleDownload"></div>
 
       <div class="caching-row">
-        <label class="cache-toggle">
-          <input type="checkbox" id="cacheToggle" />
-          <span>Prompt caching</span>
-        </label>
-        <input type="range" id="cacheRate" min="0" max="100" step="5" value="60" disabled />
-        <span class="cache-value" id="cacheValue">60% of tokens repeat</span>
+        <span class="control-label">Task complexity:</span>
+        <div class="segmented small" id="complexityToggle">
+          <button class="seg" data-tier="low">Low</button>
+          <button class="seg active" data-tier="medium">Medium</button>
+          <button class="seg" data-tier="high">High</button>
+        </div>
+        <span class="cache-value" id="tierShare"></span>
         <span class="info-icon" role="img" aria-label="About prompt caching">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5"/><path d="M12 8h.01"/></svg>
-          <span class="tooltip">If every request starts with the same instructions or chat history, ai&amp; remembers that part instead of charging full price for it again — repeated content bills at a cheaper rate. This happens automatically; nothing to set up in your code. Only prompts of 1,024+ tokens qualify, and the discount lasts about 10 minutes between calls.</span>
+          <span class="tooltip">ai&amp; automatically remembers repeated content instead of charging full price for it again — nothing to set up in your code. The more steps or tool calls a task has, the more of each request repeats from the step before, which is why complex tasks save the most. Only prompts of 1,024+ tokens qualify, and the discount holds for ~10 minutes between calls.</span>
         </span>
         <span class="cache-note" id="cacheNote"></span>
       </div>
@@ -132,10 +133,13 @@
         deducting atomically when each request completes.
       </p>
       <p>
-        Enable <strong>Prompt caching</strong> above to estimate savings: if your calls start with the
-        same instructions or chat history each time, that repeated content bills at a cheaper rate
-        automatically. Prompts of 1,024+ tokens qualify, and the discount holds for ~10 minutes between
-        calls. All models in the catalog currently offer a cached rate.
+        Caching is automatic on ai&amp;: repeated content bills at a cheaper rate with nothing to set up.
+        How much repeats depends on task complexity — pick a bucket above and the discount applies using
+        that tier's average repeat share. Prompts of 1,024+ tokens qualify, and the discount holds for
+        ~10 minutes between calls. All models in the catalog currently offer a cached rate.
+        Tier averages are
+        <a href="https://github.com/SumerSG/aiand-cache-benchmark" target="_blank" rel="noopener">measured
+        against the live API</a> (233 calls, 5 models, Aug 24–25 2026), not modeled guesses.
       </p>
       <p>
         Quality and popularity are the Theozard quality score and OpenRouter popularity rank from the
