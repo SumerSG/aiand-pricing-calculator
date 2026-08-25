@@ -153,7 +153,7 @@
             <span class="stat-value">In: ${fmtPrice(m.inputPer1M)}<br/>Out: ${fmtPrice(m.outputPer1M)}</span>
           </div>
           <div class="stat">
-            <span class="stat-label">Monthly Cost</span>
+            <span class="stat-label">Est. Monthly Cost*</span>
             <span class="stat-value cost">${fmtMoney(monthlyCost(m))}</span>
           </div>
         </div>
@@ -184,7 +184,7 @@
           <span class="provider">${m.provider}</span>
         </div>
         <div class="detail-cost">
-          <span class="stat-label">Your monthly cost</span>
+          <span class="stat-label">Est. monthly cost*</span>
           <span class="stat-value cost">${fmtMoney(monthlyCost(m))}</span>
           ${withoutCacheLineHTML(m)}
         </div>
@@ -224,7 +224,7 @@
     const rows = [
       ["", `<span class="model-id">${a.id}</span> <span class="provider">${a.provider}</span>`,
            `<span class="model-id">${b.id}</span> <span class="provider">${b.provider}</span>`],
-      ["Monthly cost", `<span class="cmp-cost">${fmtMoney(monthlyCost(a))}</span>`, `<span class="cmp-cost">${fmtMoney(monthlyCost(b))}</span>`],
+      ["Est. monthly cost*", `<span class="cmp-cost">${fmtMoney(monthlyCost(a))}</span>`, `<span class="cmp-cost">${fmtMoney(monthlyCost(b))}</span>`],
       // only meaningful when caching is on with real savings: the uncached baseline
       ...(state.cacheOn && cachedTokens() > 0 ? [["Without caching", withoutCell(a), withoutCell(b)]] : []),
       ["Description", a.description, b.description],
@@ -396,6 +396,7 @@
     const btn = e.target.closest(".seg");
     if (!btn) return;
     state.complexity = btn.dataset.tier;
+    clearPreset();
     refreshCacheUI();
     update();
   });
