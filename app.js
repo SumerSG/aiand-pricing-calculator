@@ -150,7 +150,7 @@
           </div>
           <div class="stat">
             <span class="stat-label">Per 1M Tokens</span>
-            <span class="stat-value">In: ${fmtPrice(m.inputPer1M)}<br/>Out: ${fmtPrice(m.outputPer1M)}</span>
+            <span class="stat-value">In: ${fmtPrice(m.inputPer1M)}<br/>Out: ${fmtPrice(m.outputPer1M)}${m.cachedInputPer1M != null ? `<br/>Cached in: ${fmtPrice(m.cachedInputPer1M)}` : ""}</span>
           </div>
           <div class="stat">
             <span class="stat-label">Est. Monthly Cost*</span>
