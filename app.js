@@ -385,7 +385,7 @@
     complexityEl.querySelectorAll(".seg").forEach((b) =>
       b.classList.toggle("active", b.dataset.tier === state.complexity)
     );
-    tierShareEl.textContent = `≈${Math.round(tier.share * 100)}% of tokens repeat on average — ${tier.blurb}`;
+    tierShareEl.textContent = tier.blurb;
     cacheNoteEl.textContent =
       state.inputTokens < CACHE_MIN_TOKENS
         ? `Prompts under ${CACHE_MIN_TOKENS.toLocaleString()} tokens don't qualify for caching — no discount applied.`
@@ -447,7 +447,7 @@
 
     const label = document.createElement("div");
     label.className = "preset-group-label";
-    label.textContent = `${tier.label} complexity · ≈${Math.round(tier.share * 100)}% repeat`;
+    label.textContent = `${tier.label} complexity`;
     group.appendChild(label);
 
     const buttons = document.createElement("div");
